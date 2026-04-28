@@ -1,25 +1,21 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { LoginPage } from '../../pages/LoginPage';
 
+// Test 1: Verify login page UI elements are visible
 test('login page UI should be visible', async ({ page }) => {
-  await page.goto('/login');
+  const loginPage = new LoginPage(page);
 
-  const loginForm = page.locator('form');
-
-  await expect(loginForm.getByRole('textbox', { name: 'Email' })).toBeVisible();
-  await expect(loginForm.getByRole('textbox', { name: 'Password' })).toBeVisible();
-  await expect(loginForm.getByRole('button', { name: 'Login' })).toBeVisible();
+  await loginPage.goto();
+  await loginPage.expectLoginPageVisible();
 });
 
+// Test 2: Verify invalid login shows proper error message
+test('should show error for invalid login', async ({ page }) => {
+  const loginPage = new LoginPage(page);
 
+  await loginPage.goto();
 
-test('should show validation or error for invalid login', async ({ page }) => {
-  await page.goto('/login');
+  await loginPage.login('wrong@example.com', 'wrongpassword');
 
-  const loginForm = page.locator('form');
-
-  await loginForm.getByRole('textbox', { name: 'Email' }).fill('wrong@example.com');
-  await loginForm.getByRole('textbox', { name: 'Password' }).fill('wrongpassword');
-  await loginForm.getByRole('button', { name: 'Login' }).click();
-
-  await expect(page).toHaveURL(/login|app|forgot/i);
+  await loginPage.expectInvalidLoginMessage();
 });
