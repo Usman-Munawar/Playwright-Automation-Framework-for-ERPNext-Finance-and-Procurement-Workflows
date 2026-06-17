@@ -3,13 +3,13 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)
 ![Playwright](https://img.shields.io/badge/Testing-Playwright-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20+-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+![License](https://img.shields.io/badge/License-ISC-yellow)
 
 A Playwright-based end-to-end test automation framework for ERPNext workflows, organized with the Page Object Model and configured for HTML reporting, screenshots, videos, and retry traces.
 
 ## Overview
 
-This repository uses `@playwright/test` as the core test runner, loads environment variables with `dotenv`, and targets tests from the `tests` directory through a shared Playwright configuration.The current configuration runs tests in Chromium, supports parallel execution locally, and enables retries plus trace collection on CI.
+This repository uses `@playwright/test` as the core test runner, loads environment variables with `dotenv`, and targets tests from the `tests` directory through a shared Playwright configuration. It runs tests in Chromium, supports parallel execution locally, and enables retries plus trace collection for CI workflows.
 
 ## Features
 
@@ -24,6 +24,7 @@ This repository uses `@playwright/test` as the core test runner, loads environme
 
 ```text
 .
+├── fixtures/
 ├── pages/
 │   ├── BlogPage.ts
 │   ├── ContactPage.ts
@@ -31,17 +32,22 @@ This repository uses `@playwright/test` as the core test runner, loads environme
 │   ├── ProductPage.ts
 │   └── SupplierPage.ts
 ├── tests/
+│   ├── auth/
+│   ├── finance/
+│   ├── procurement/
+│   └── public/
 ├── playwright.config.ts
 ├── package.json
 ├── package-lock.json
-└── LICENSE
+├── LICENSE
+└── README.me
 ```
 
 The repository separates page interaction logic into dedicated page objects such as `LoginPage`, `SupplierPage`, `ProductPage`, `ContactPage`, and `BlogPage`, which helps keep tests easier to read and maintain.
 
 ## Prerequisites
 
-- Node.js 18 or newer is recommended for current Playwright releases.
+- Node.js 18 or newer is recommended.
 - npm.
 - Access to an ERPNext or Frappe-based environment.
 - Valid test credentials stored outside source control.
@@ -55,8 +61,6 @@ npm install
 npx playwright install
 ```
 
-The repository declares `@playwright/test`, `@types/node`, and `dotenv` in `package.json`, so `npm install` will pull the framework dependencies needed to run the tests.
-
 ## Environment Setup
 
 Create a `.env` file in the project root:
@@ -67,7 +71,7 @@ LOGIN_EMAIL=your-test-user@example.com
 LOGIN_PASSWORD=your-secure-password
 ```
 
-The Playwright configuration reads environment variables with `dotenv.config()` and uses `process.env.BASE_URL` as the shared `baseURL` for test navigation. If the tests reference login credentials through environment variables, keep them in `.env` and never commit that file because `.gitignore` excludes `.env` and `.env.*` by default.
+The Playwright configuration reads environment variables with `dotenv.config()` and uses `process.env.BASE_URL` as the shared `baseURL` for test navigation. Keep `.env` out of source control.
 
 ## Running Tests
 
@@ -95,11 +99,9 @@ Open the HTML report after execution:
 npx playwright show-report
 ```
 
-The framework is configured with the `html` reporter, so report output is generated after test execution and can be reviewed locally in a browser.
-
 ## Test Design
 
-The framework follows the Page Object Model, where reusable actions and assertions live in dedicated classes and tests consume those abstractions instead of low-level selectors.Based on the page object files, the current scope includes login, suppliers, products, contact page, and blog page coverage.
+The framework follows the Page Object Model, where reusable actions and assertions live in dedicated classes and tests consume those abstractions instead of low-level selectors.
 
 Example pattern:
 
@@ -118,11 +120,11 @@ test('user can log in', async ({ page }) => {
 
 ## Configuration Notes
 
-The `playwright.config.ts` file sets `testDir` to `./tests`, enables `fullyParallel`, uses Chromium as the active browser project, and keeps Firefox/WebKit examples commented for future expansion. It also stores screenshots only on failure, retains videos on failure, and captures traces on first retry, which is useful for debugging flaky or environment-specific issues.
+The `playwright.config.ts` file sets `testDir` to `./tests`, enables `fullyParallel`, uses Chromium as the active browser project, and keeps failure artifacts for debugging. It also stores screenshots only on failure, retains videos on failure, and captures traces on first retry.
 
-## Suggested npm Scripts
+## Recommended npm Scripts
 
-`package.json` currently has an empty `scripts` section, so adding a few standard commands will make the project easier to use.
+Add these scripts to `package.json` for easier usage:
 
 ```json
 "scripts": {
@@ -135,4 +137,4 @@ The `playwright.config.ts` file sets `testDir` to `./tests`, enables `fullyParal
 
 ## License
 
-This repository includes an MIT-style open source workflow structure but the current `package.json` license field is set to `ISC`, so the effective license should be confirmed against the `LICENSE` file before redistribution.
+This repository is currently licensed under `ISC` according to `package.json`, and includes an MIT-style workflow structure in the repository docs. Confirm the effective license before redistribution.
